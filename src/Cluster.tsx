@@ -17,6 +17,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
     minPoints = 2,
     children,
     onClick,
+    superclusterRef,
   } = props;
 
   const maxClusterZoom: number = useMemo(() => {
@@ -87,6 +88,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
     (props) => {
       const pointsMap = generatePointsMap(children);
       const index = loadPoints(pointsMap);
+      superclusterRef.current = index;
 
       setState({
         pointsMap,
