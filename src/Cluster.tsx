@@ -127,6 +127,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
       displayElement = (
         <ClusterMarker
           key={clusterElementKey}
+          clusterId={markerOrCluster.id}
           count={markerOrCluster.properties.point_count}
           pixelOffset={pixelOffset}
           clusterStyleFunction={clusterStyleFunction}

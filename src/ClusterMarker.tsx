@@ -12,6 +12,7 @@ const defaultCountToColor = (count: number) => {
 };
 
 const ClusterMarker: FC<ClusterMarkerProps> = ({
+  clusterId,
   pixelOffset,
   count,
   clusterStyleFunction,
@@ -19,7 +20,7 @@ const ClusterMarker: FC<ClusterMarkerProps> = ({
   clusterMarkerRadius,
   onClusterClick,
 }) => {
-  const markerStyle = clusterStyleFunction?.(count, pixelOffset) ?? {
+  const defaultClusterStyle = {
     width: clusterMarkerRadius,
     height: clusterMarkerRadius,
     borderRadius: "50%",
@@ -36,6 +37,10 @@ const ClusterMarker: FC<ClusterMarkerProps> = ({
     top: pixelOffset?.[1],
     zIndex: 1,
     transform: "translate(-50%, -50%)",
+  };
+  const markerStyle = {
+    ...defaultClusterStyle,
+    ...clusterStyleFunction?.(clusterId, count, pixelOffset),
   };
 
   const Cluster = useMemo(() => {

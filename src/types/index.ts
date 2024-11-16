@@ -99,6 +99,7 @@ export interface ClustererProps {
   minPoints?: number;
   clusterMarkerRadius?: number;
   clusterStyleFunction?: (
+    clusterId: number,
     pointCount: number,
     markerPixelOffset?: [number, number],
   ) => CSSProperties;
@@ -110,6 +111,7 @@ export interface ClustererProps {
 }
 
 export interface ClusterMarkerProps {
+  clusterId: number;
   count: number;
   pixelOffset?: [number, number];
   clusterStyleFunction: ClustererProps["clusterStyleFunction"];
