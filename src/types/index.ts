@@ -1,4 +1,5 @@
 import { CSSProperties, JSX, ReactElement, ReactNode } from "react";
+import supercluster from "supercluster";
 
 export type Point = [number, number];
 
@@ -108,6 +109,7 @@ export interface ClustererProps {
     markerPixelOffset?: [number, number],
   ) => ReactElement;
   onClick?: (data: ClusterData) => void;
+  superclusterRef?: React.useRef<supercluster>;
 }
 
 export interface ClusterMarkerProps {

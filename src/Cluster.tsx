@@ -1,7 +1,25 @@
 import supercluster from "supercluster";
 import ClusterMarker from "./ClusterMarker";
-import React, { FC, useCallback, useEffect, useState, cloneElement, useMemo } from "react";
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useState,
+  cloneElement,
+  useMemo,
+  ReactNode,
+} from "react";
 import { Point, ClustererProps } from "./types";
+
+interface PointsMap {
+  [key: string]: {
+    vNode: ReactNode;
+    geometry: {
+      coordinates: [number, number];
+    };
+    id: string;
+  };
+}
 
 export const Cluster: FC<ClustererProps> = (props) => {
   const {
@@ -40,9 +58,9 @@ export const Cluster: FC<ClustererProps> = (props) => {
   const [state, setState] = useState<{ pointsMap?: Record<string, any>; index?: supercluster }>({});
 
   const generatePointsMap = useCallback(
-    (children) => {
+    (children: ReactNode) => {
       const childrenArray = Array.isArray(children) ? children : [children];
-      const pointsMap = {};
+      const pointsMap: PointsMap = {};
 
       childrenArray.forEach((child) => {
         if (!child) return;
@@ -71,7 +89,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
   );
 
   const loadPoints = useCallback(
-    (pointsMap) => {
+    (pointsMap: PointsMap) => {
       const index = new supercluster({
         radius: clusterMarkerRadius || 40,
         maxZoom: maxClusterZoom,
@@ -88,7 +106,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
     (props) => {
       const pointsMap = generatePointsMap(children);
       const index = loadPoints(pointsMap);
-      superclusterRef.current = index;
+      if (superclusterRef) superclusterRef.current = index;
 
       setState({
         pointsMap,

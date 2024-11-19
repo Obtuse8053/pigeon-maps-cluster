@@ -39,7 +39,8 @@
   "eslintConfig": {
     "ignorePatterns": [
       "node_modules",
-      "dist"
+      "dist",
+      "app/_clusterer"
     ]
   },
   "keywords": [
