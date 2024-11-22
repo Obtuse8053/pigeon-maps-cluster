@@ -20,7 +20,7 @@ const ClusterMarker: FC<ClusterMarkerProps> = ({
   clusterMarkerRadius,
   onClusterClick,
 }) => {
-  const defaultClusterStyle = {
+  const defaultClusterStyle: React.CSSProperties = {
     width: clusterMarkerRadius,
     height: clusterMarkerRadius,
     borderRadius: "50%",
@@ -38,7 +38,7 @@ const ClusterMarker: FC<ClusterMarkerProps> = ({
     zIndex: 1,
     transform: "translate(-50%, -50%)",
   };
-  const markerStyle = {
+  const markerStyle: React.CSSProperties = {
     ...defaultClusterStyle,
     ...clusterStyleFunction?.(clusterId, count, pixelOffset),
   };

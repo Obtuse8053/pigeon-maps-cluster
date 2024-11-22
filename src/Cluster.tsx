@@ -1,4 +1,4 @@
-import supercluster from "supercluster";
+import supercluster, { AnyProps, PointFeature } from "supercluster";
 import ClusterMarker from "./ClusterMarker";
 import React, {
   FC,
@@ -10,16 +10,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Point, ClustererProps } from "./types";
-
-interface PointsMap {
-  [key: string]: {
-    vNode: ReactNode;
-    geometry: {
-      coordinates: [number, number];
-    };
-    id: string;
-  };
-}
+import Supercluster from "supercluster";
 
 export const Cluster: FC<ClustererProps> = (props) => {
   const {
@@ -60,7 +51,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
   const generatePointsMap = useCallback(
     (children: ReactNode) => {
       const childrenArray = Array.isArray(children) ? children : [children];
-      const pointsMap: PointsMap = {};
+      const pointsMap: Record<string, PointFeature<AnyProps>> = {};
 
       childrenArray.forEach((child) => {
         if (!child) return;
@@ -72,11 +63,13 @@ export const Cluster: FC<ClustererProps> = (props) => {
           throw new Error("Markers must have an anchor property");
         }
         pointsMap[key] = {
-          vNode: cloneElement(child, {
+          properties: cloneElement(child, {
             latLngToPixel,
             pixelToLatLng,
           }),
+          type: "Feature",
           geometry: {
+            type: "Point",
             coordinates: child.props.anchor,
           },
           id: key,
@@ -89,49 +82,50 @@ export const Cluster: FC<ClustererProps> = (props) => {
   );
 
   const loadPoints = useCallback(
-    (pointsMap: PointsMap) => {
+    (pointsMap: Record<string, PointFeature<AnyProps>>) => {
       const index = new supercluster({
         radius: clusterMarkerRadius || 40,
         maxZoom: maxClusterZoom,
         minZoom: minClusterZoom,
         minPoints,
       });
-      index.load(Object.keys(pointsMap).map((id) => pointsMap[id]));
+      index.load(Object.values(pointsMap));
       return index;
     },
     [clusterMarkerRadius, maxClusterZoom, minPoints, minClusterZoom],
   );
 
-  const rebuildData = useCallback(
-    (props) => {
-      const pointsMap = generatePointsMap(children);
-      const index = loadPoints(pointsMap);
-      if (superclusterRef) superclusterRef.current = index;
+  const rebuildData = useCallback(() => {
+    const pointsMap = generatePointsMap(children);
+    const index = loadPoints(pointsMap);
+    if (superclusterRef) superclusterRef.current = index;
 
-      setState({
-        pointsMap,
-        index,
-      });
-    },
-    [children, generatePointsMap, loadPoints],
-  );
+    setState({
+      pointsMap,
+      index,
+    });
+  }, [children, generatePointsMap, loadPoints]);
 
   useEffect(() => {
-    rebuildData(props);
-  }, [props, rebuildData]);
+    rebuildData();
+  }, [rebuildData]); // props was removed as a dependency, hence on prop change, data might not be rebuilt
 
   const ne = mapState?.bounds.ne ?? [0, 0];
   const sw = mapState?.bounds.sw ?? [0, 0];
   const [westLng, southLat, eastLng, northLat] = [sw[0], sw[1], ne[0], ne[1]];
 
-  const markersAndClusters = state.index?.getClusters(
-    [westLng, southLat, eastLng, northLat],
-    Math.floor(mapState?.zoom ?? 0),
-  );
+  const markersAndClusters: Array<
+    Supercluster.ClusterFeature<AnyProps> | Supercluster.PointFeature<AnyProps>
+  > = state.index
+    ? state.index.getClusters(
+        [westLng, southLat, eastLng, northLat],
+        Math.floor(mapState?.zoom ?? 0),
+      )
+    : [];
 
-  const displayElements = (markersAndClusters || []).map((markerOrCluster) => {
+  const displayElements = markersAndClusters.map((markerOrCluster) => {
     let displayElement;
-    const isCluster = markerOrCluster?.properties?.cluster;
+    const isCluster = markerOrCluster.properties?.cluster;
     const pixelOffset = latLngToPixel?.(markerOrCluster.geometry.coordinates as Point);
 
     const onClusterClick = () =>
@@ -145,7 +139,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
       displayElement = (
         <ClusterMarker
           key={clusterElementKey}
-          clusterId={markerOrCluster.id}
+          clusterId={markerOrCluster.id as number} // Force number type
           count={markerOrCluster.properties.point_count}
           pixelOffset={pixelOffset}
           clusterStyleFunction={clusterStyleFunction}

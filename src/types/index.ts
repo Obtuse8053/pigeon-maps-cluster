@@ -1,5 +1,6 @@
-import { CSSProperties, JSX, ReactElement, ReactNode } from "react";
-import supercluster from "supercluster";
+import { CSSProperties, JSX, MutableRefObject, ReactElement, ReactNode } from "react";
+import supercluster, { AnyProps, ClusterProperties } from "supercluster";
+import { Point } from "geojson";
 
 export type Point = [number, number];
 
@@ -108,8 +109,8 @@ export interface ClustererProps {
     pointCount: number,
     markerPixelOffset?: [number, number],
   ) => ReactElement;
-  onClick?: (data: ClusterData) => void;
-  superclusterRef?: React.useRef<supercluster>;
+  onClick?: (data: Point & (ClusterProperties | AnyProps)) => void;
+  superclusterRef?: MutableRefObject<supercluster>;
 }
 
 export interface ClusterMarkerProps {
