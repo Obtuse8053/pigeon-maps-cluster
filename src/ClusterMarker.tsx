@@ -44,7 +44,7 @@ const ClusterMarker: FC<ClusterMarkerProps> = ({
   };
 
   const Cluster = useMemo(() => {
-    if (clusterRenderFunction) return clusterRenderFunction(count, pixelOffset);
+    if (clusterRenderFunction) return clusterRenderFunction(clusterId, count, pixelOffset);
     return (
       <div onClick={onClusterClick} style={markerStyle}>
         {count}

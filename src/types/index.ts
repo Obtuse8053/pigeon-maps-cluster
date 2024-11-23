@@ -1,7 +1,6 @@
 import { CSSProperties, JSX, MutableRefObject, ReactElement, ReactNode } from "react";
 import supercluster, { AnyProps, ClusterProperties } from "supercluster";
-import { Point } from "geojson";
-
+import { GeoJSON } from "geojson";
 export type Point = [number, number];
 
 export interface MapState {
@@ -86,6 +85,10 @@ export interface MapProps {
   tileComponent?: TileComponent;
 }
 
+import { Point as GeoJSONPoint } from "geojson";
+
+export type ClusterOnClickProps = GeoJSONPoint & (ClusterProperties | AnyProps);
+
 export interface ClustererProps {
   children: (ReactElement | null)[];
   left?: number;
@@ -106,11 +109,12 @@ export interface ClustererProps {
     markerPixelOffset?: [number, number],
   ) => CSSProperties;
   clusterRenderFunction?: (
+    clusterId: number,
     pointCount: number,
     markerPixelOffset?: [number, number],
   ) => ReactElement;
-  onClick?: (data: Point & (ClusterProperties | AnyProps)) => void;
-  superclusterRef?: MutableRefObject<supercluster>;
+  onClick?: (data: ClusterOnClickProps) => void;
+  superclusterRef?: MutableRefObject<supercluster | null>;
 }
 
 export interface ClusterMarkerProps {
@@ -121,13 +125,4 @@ export interface ClusterMarkerProps {
   clusterRenderFunction: ClustererProps["clusterRenderFunction"];
   clusterMarkerRadius: number;
   onClusterClick?: () => void;
-}
-
-export interface ClusterData {
-  cluster: boolean;
-  cluster_id: number;
-  coordinates: Point;
-  point_count: number;
-  point_count_abbreviated: number;
-  type: "Point";
 }
