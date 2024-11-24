@@ -1,6 +1,6 @@
 import { CSSProperties, JSX, MutableRefObject, ReactElement, ReactNode } from "react";
 import supercluster, { AnyProps, ClusterProperties } from "supercluster";
-import { GeoJSON } from "geojson";
+import { Point as GeoJSONPoint } from "geojson";
 export type Point = [number, number];
 
 export interface MapState {
@@ -84,8 +84,6 @@ export interface MapProps {
   boxClassname?: string;
   tileComponent?: TileComponent;
 }
-
-import { Point as GeoJSONPoint } from "geojson";
 
 export type ClusterOnClickProps = GeoJSONPoint & (ClusterProperties | AnyProps);
 
