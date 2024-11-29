@@ -1,4 +1,4 @@
-import supercluster, { AnyProps, PointFeature } from "supercluster";
+import supercluster, { PointFeature } from "supercluster";
 import ClusterMarker from "./ClusterMarker";
 import React, {
   FC,
@@ -11,6 +11,8 @@ import React, {
 } from "react";
 import { Point, ClustererProps } from "./types";
 import Supercluster from "supercluster";
+
+type TPointMap = Record<string, PointFeature>;
 
 export const Cluster: FC<ClustererProps> = (props) => {
   const {
@@ -46,12 +48,12 @@ export const Cluster: FC<ClustererProps> = (props) => {
     return 0;
   }, [minZoom, maxClusterZoom]);
 
-  const [state, setState] = useState<{ pointsMap?: Record<string, any>; index?: supercluster }>({});
+  const [state, setState] = useState<{ pointsMap?: TPointMap; index?: supercluster }>({});
 
   const generatePointsMap = useCallback(
     (children: ReactNode) => {
       const childrenArray = Array.isArray(children) ? children : [children];
-      const pointsMap: Record<string, PointFeature<AnyProps>> = {};
+      const pointsMap: TPointMap = {};
 
       childrenArray.forEach((child) => {
         if (!child) return;
@@ -82,7 +84,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
   );
 
   const loadPoints = useCallback(
-    (pointsMap: Record<string, PointFeature<AnyProps>>) => {
+    (pointsMap: TPointMap) => {
       const index = new supercluster({
         radius: clusterMarkerRadius || 40,
         maxZoom: maxClusterZoom,
@@ -114,14 +116,13 @@ export const Cluster: FC<ClustererProps> = (props) => {
   const sw = mapState?.bounds.sw ?? [0, 0];
   const [westLng, southLat, eastLng, northLat] = [sw[0], sw[1], ne[0], ne[1]];
 
-  const markersAndClusters: Array<
-    Supercluster.ClusterFeature<AnyProps> | Supercluster.PointFeature<AnyProps>
-  > = state.index
-    ? state.index.getClusters(
-        [westLng, southLat, eastLng, northLat],
-        Math.floor(mapState?.zoom ?? 0),
-      )
-    : [];
+  const markersAndClusters: Array<Supercluster.ClusterFeature | Supercluster.PointFeature> =
+    state.index
+      ? state.index.getClusters(
+          [westLng, southLat, eastLng, northLat],
+          Math.floor(mapState?.zoom ?? 0),
+        )
+      : [];
 
   const displayElements = markersAndClusters.map((markerOrCluster) => {
     let displayElement;
@@ -149,7 +150,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
         />
       );
     } else {
-      displayElement = cloneElement(state.pointsMap?.[markerOrCluster.id!].vNode, {
+      displayElement = cloneElement(state.pointsMap?.[markerOrCluster.id!].properties, {
         left: pixelOffset?.[0],
         top: pixelOffset?.[1],
       });
