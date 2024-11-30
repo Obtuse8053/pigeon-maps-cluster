@@ -1,18 +1,10 @@
-import supercluster, { PointFeature } from "supercluster";
+import supercluster from "supercluster";
+import Supercluster, { AnyProps, PointFeature } from "supercluster";
 import ClusterMarker from "./ClusterMarker";
-import React, {
-  FC,
-  useCallback,
-  useEffect,
-  useState,
-  cloneElement,
-  useMemo,
-  ReactNode,
-} from "react";
-import { Point, ClustererProps } from "./types";
-import Supercluster from "supercluster";
+import React, { cloneElement, FC, ReactElement, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ClustererProps, Point } from "./types";
 
-type TPointMap = Record<string, PointFeature>;
+type TPointMap = Record<string, PointFeature<ReactElement>>;
 
 export const Cluster: FC<ClustererProps> = (props) => {
   const {
@@ -48,7 +40,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
     return 0;
   }, [minZoom, maxClusterZoom]);
 
-  const [state, setState] = useState<{ pointsMap?: TPointMap; index?: supercluster }>({});
+  const [state, setState] = useState<{ pointsMap?: TPointMap; index?: Supercluster }>({});
 
   const generatePointsMap = useCallback(
     (children: ReactNode) => {
@@ -116,7 +108,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
   const sw = mapState?.bounds.sw ?? [0, 0];
   const [westLng, southLat, eastLng, northLat] = [sw[0], sw[1], ne[0], ne[1]];
 
-  const markersAndClusters: Array<Supercluster.ClusterFeature | Supercluster.PointFeature> =
+  const markersAndClusters: Array<Supercluster.ClusterFeature<AnyProps> | Supercluster.PointFeature<AnyProps>> =
     state.index
       ? state.index.getClusters(
           [westLng, southLat, eastLng, northLat],
