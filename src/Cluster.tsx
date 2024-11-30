@@ -142,7 +142,7 @@ export const Cluster: FC<ClustererProps> = (props) => {
         />
       );
     } else {
-      displayElement = cloneElement(state.pointsMap?.[markerOrCluster.id!].properties, {
+      displayElement = cloneElement(state.pointsMap![markerOrCluster.id!].properties, {
         left: pixelOffset?.[0],
         top: pixelOffset?.[1],
       });
